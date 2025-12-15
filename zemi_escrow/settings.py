@@ -1,10 +1,11 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-secret-key-change-in-production')
+load_dotenv(BASE_DIR / ".env")
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
@@ -88,17 +89,36 @@ REST_FRAMEWORK = {
     ],
 }
 
-# # M-Pesa Configuration
-# MPESA_ENVIRONMENT = os.environ.get('MPESA_ENVIRONMENT', 'sandbox')
-# MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', '')
-# MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', '')
-# MPESA_SHORTCODE = os.environ.get('MPESA_SHORTCODE', '')
-# MPESA_PASSKEY = os.environ.get('MPESA_PASSKEY', '')
-# MPESA_INITIATOR_NAME = os.environ.get('MPESA_INITIATOR_NAME', '')
-# MPESA_SECURITY_CREDENTIAL = os.environ.get('MPESA_SECURITY_CREDENTIAL', '')
-# MPESA_CALLBACK_URL = os.environ.get('MPESA_CALLBACK_URL', 'https://yourdomain.com/api/webhooks/mpesa/')
-# MPESA_B2C_QUEUE_TIMEOUT_URL = os.environ.get('MPESA_B2C_QUEUE_TIMEOUT_URL', 'https://yourdomain.com/api/webhooks/mpesa-b2c-timeout/')
-# MPESA_B2C_RESULT_URL = os.environ.get('MPESA_B2C_RESULT_URL', 'https://yourdomain.com/api/webhooks/mpesa-b2c-result/')
+def env(key: str, default=None, *, required=False):
+    value = os.getenv(key, default)
+    if required and not value:
+        raise RuntimeError(f"Missing required environment variable: {key}")
+    return value
+
+DJANGO_ENV = env("DJANGO_ENV", "development")
+MPESA_ENVIRONMENT = env("MPESA_ENVIRONMENT", "sandbox")
+
+# M-Pesa Configuration
+MPESA_CONSUMER_KEY = env("MPESA_CONSUMER_KEY", required=True)
+MPESA_CONSUMER_SECRET = env("MPESA_CONSUMER_SECRET", required=True)
+MPESA_SHORTCODE = env("MPESA_SHORTCODE", required=True)
+MPESA_PASSKEY = env("MPESA_PASSKEY", required=True)
+MPESA_INITIATOR_NAME = env("MPESA_INITIATOR_NAME", required=True)
+MPESA_SECURITY_CREDENTIAL = env("MPESA_SECURITY_CREDENTIAL", required=True)
+MPESA_CALLBACK_URL = env(
+    "MPESA_CALLBACK_URL",
+    "http://127.0.0.1:4040/api/webhooks/mpesa/"
+)
+
+MPESA_B2C_QUEUE_TIMEOUT_URL = env(
+    "MPESA_B2C_QUEUE_TIMEOUT_URL",
+    "http://127.0.0.1:4040/api/webhooks/mpesa-b2c-timeout/"
+)
+
+MPESA_B2C_RESULT_URL = env(
+    "MPESA_B2C_RESULT_URL",
+    "http://127.0.0.1:4040/api/webhooks/mpesa-b2c-result/"
+)
 
 # # Stripe Configuration
 # STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
