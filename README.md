@@ -893,7 +893,7 @@ MPESA_CALLBACK_URL=https://yourdomain.com/api/webhooks/mpesa/
 
 ---
 
-## 📝 Assumptions Made
+##  Assumptions Made
 
 1. **Phone Numbers:** All phone numbers are Kenyan (+254 format)
 2. **Currency:** All amounts are in Kenyan Shillings (KES)
@@ -908,9 +908,9 @@ MPESA_CALLBACK_URL=https://yourdomain.com/api/webhooks/mpesa/
 
 ---
 
-## 👤 Author
+##  Author
 
-** Peter Martin**
+** Peter Martin **
 - GitHub: [@Petermartin064](https://github.com/Petermartin064)
 - Email: petermartin602@gmail.com
 
