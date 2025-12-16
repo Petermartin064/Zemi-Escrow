@@ -393,6 +393,70 @@ def mpesa_callback(request):
         logger.error(f"M-Pesa callback processing failed: {str(e)}")
         return Response({'ResultCode': 1, 'ResultDesc': 'Failed'})
 
+
+@api_view(['POST'])
+def mpesa_b2c_payout(request):
+    """
+    Initiate M-Pesa B2C payout to seller
+    
+    POST /api/payments/mpesa/b2c-payout
+    {
+        "phone_number": "254712345678",
+        "amount": 1500.00,
+        "order_reference": "ZEM-ABC123"
+    }
+    """
+    phone_number = request.data.get('phone_number')
+    amount = request.data.get('amount')
+    order_reference = request.data.get('order_reference')
+    
+    if not all([phone_number, amount, order_reference]):
+        return Response({
+            'success': False,
+            'error': 'Missing required fields'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        mpesa_service = MpesaService()
+        result = mpesa_service.b2c_payment(
+            phone_number=phone_number,
+            amount=amount,
+            remarks=f"Payout for order {order_reference}"
+        )
+        
+        if result['success']:
+            return Response({
+                'success': True,
+                'data': result
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'success': False,
+                'error': result.get('error', 'B2C payout failed')
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+    except Exception as e:
+        logger.error(f"B2C payout failed: {str(e)}")
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+from django.http import HttpResponse
+
+@csrf_exempt
+@api_view(['POST'])
+def mpesa_b2c_result(request):
+    # You can log the request data if needed
+    return HttpResponse(status=200)
+
+@csrf_exempt
+@api_view(['POST'])
+def mpesa_b2c_timeout(request):
+    return HttpResponse(status=200)
+
+
 @api_view(['GET'])
 def get_order(request, order_reference):
     """Get order details"""
