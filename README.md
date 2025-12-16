@@ -831,7 +831,7 @@ zemi-africa-mvp/
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 ### Run Tests
 ```bash
