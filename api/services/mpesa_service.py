@@ -124,6 +124,72 @@ class MpesaService:
                 'error': error_message
             }
         
+    def b2c_payment(self, phone_number: str, amount: float, remarks: str = "Payment"):
+        """
+        Send B2C payment (Business to Customer)
+        
+        Args:
+            phone_number: Recipient phone number (254XXXXXXXXX format)
+            amount: Amount to be sent
+            remarks: Payment remarks
+        
+        Returns:
+            dict: Response from M-Pesa API
+        """
+        try:
+            access_token = self.get_access_token()
+            
+            url = f"{self.base_url}/mpesa/b2c/v1/paymentrequest"
+            
+            headers = {
+                'Authorization': f'Bearer {access_token}',
+                'Content-Type': 'application/json'
+            }
+            
+            payload = {
+                "InitiatorName": self.initiator_name,
+                "SecurityCredential": self.security_credential,
+                "CommandID": "BusinessPayment",
+                "Amount": int(amount),
+                "PartyA": self.shortcode,
+                "PartyB": phone_number,
+                "Remarks": remarks,
+                "QueueTimeOutURL": settings.MPESA_B2C_QUEUE_TIMEOUT_URL,
+                "ResultURL": settings.MPESA_B2C_RESULT_URL,
+                "Occasion": "Payout"
+            }
+            
+            logger.info(f"Initiating B2C payment to {phone_number}, Amount: {amount}")
+            
+            response = requests.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            
+            result = response.json()
+            logger.info(f"B2C payment initiated successfully: {result}")
+            
+            return {
+                'success': True,
+                'conversation_id': result.get('ConversationID'),
+                'originator_conversation_id': result.get('OriginatorConversationID'),
+                'response_code': result.get('ResponseCode'),
+                'response_description': result.get('ResponseDescription')
+            }
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"B2C payment failed: {str(e)}")
+            error_message = str(e)
+            
+            if hasattr(e, 'response') and e.response is not None:
+                try:
+                    error_data = e.response.json()
+                    error_message = error_data.get('errorMessage', str(e))
+                except:
+                    pass
+            
+            return {
+                'success': False,
+                'error': error_message
+            }
     
     def query_transaction_status(self, checkout_request_id: str):
         """
