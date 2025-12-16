@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.contrib.auth.hashers import check_password
 from django.utils import timezone
@@ -391,7 +392,6 @@ def mpesa_callback(request):
     except Exception as e:
         logger.error(f"M-Pesa callback processing failed: {str(e)}")
         return Response({'ResultCode': 1, 'ResultDesc': 'Failed'})
-
 
 @api_view(['GET'])
 def get_order(request, order_reference):

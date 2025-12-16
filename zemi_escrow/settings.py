@@ -7,6 +7,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
+def env(key: str, default=None, *, required=False):
+    value = os.getenv(key, default)
+    if required and not value:
+        raise RuntimeError(f"Missing required environment variable: {key}")
+    return value
+
+SECRET_KEY = env('DJANGO_SECRET_KEY', 'django-insecure-fallback-key-change-this-in-production')
+
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
@@ -89,12 +97,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-def env(key: str, default=None, *, required=False):
-    value = os.getenv(key, default)
-    if required and not value:
-        raise RuntimeError(f"Missing required environment variable: {key}")
-    return value
-
 DJANGO_ENV = env("DJANGO_ENV", "development")
 MPESA_ENVIRONMENT = env("MPESA_ENVIRONMENT", "sandbox")
 
@@ -119,8 +121,3 @@ MPESA_B2C_RESULT_URL = env(
     "MPESA_B2C_RESULT_URL",
     "http://127.0.0.1:4040/api/webhooks/mpesa-b2c-result/"
 )
-
-# # Stripe Configuration
-# STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
-# STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
-# STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
