@@ -6,7 +6,6 @@ A backend API for Zemi Africa's escrow checkout platform, built with Django and 
 
 ### Prerequisites
 - Python 3.9+
-- PostgreSQL 12+
 - M-Pesa Daraja API credentials (sandbox or production)
 - Stripe API keys (optional)
 
